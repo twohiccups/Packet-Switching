@@ -38,16 +38,7 @@ public class SwitchingSimulation extends Application {
         // run the discrete simulation
         simulateOuterLoop();
         
-        // test
-        for(int i = 0; i < allData.size(); i++) {
-            System.out.println("A: " + allData.get(i).totalAtA +
-                               " B: " + allData.get(i).totalAtB +
-                               " C: " + allData.get(i).totalAtC +
-                               " T(A): " + allData.get(i).throughputAtA +
-                               " T(C): " + allData.get(i).throughputAtC);
-        }
-        
-        // 
+ 
         NumberAxis probabilityAxis = new NumberAxis(0,1,0.01);
         probabilityAxis.setLabel("Probability");
         NumberAxis throughputAxis  = new NumberAxis(0,1,0.01);
@@ -56,22 +47,28 @@ public class SwitchingSimulation extends Application {
                 new ScatterChart<Number, Number> (probabilityAxis,throughputAxis);
         chart1.setTitle("Throughput at A  vs  Probability");
         
-        XYChart.Series series = 
+        XYChart.Series series1 = new XYChart.Series();
+        series1.setName("Scatter Data");
         
+        for (int i = 0; i < allData.size(); i++) {
+            series1.getData().add(
+                    new XYChart.Data(i * 0.01, allData.get(i).throughputAtA)); 
+        }
         
-        
+        chart1.getData().add(series1);
         
         
         HBox root = new HBox();
+        root.getChildren().add(chart1);
         
        
         
         
-        Scene scene = new Scene(root, 300, 250);
+        Scene scene = new Scene(root, 500, 500);
         
         primaryStage.setTitle("Discrete Probability Simulation!");
         primaryStage.setScene(scene);
-    //    primaryStage.show();
+       primaryStage.show();
     }
 
     
@@ -90,6 +87,8 @@ public class SwitchingSimulation extends Application {
         }  
     }
     
+    // generates packets at a given timeslot
+    // and updates the data class
     public void simulateInnerLoop(double probability, Data data) {
         for (int i = 0; i < Data.totalSlots; i++) {
             simulateStep(probability, data);    
@@ -97,7 +96,8 @@ public class SwitchingSimulation extends Application {
     }
     
     
-    
+    // generates packets at a given time slot
+    // and updates the data class
     private  void simulateStep(double probability, Data data) {
         
         Boolean atLeastOneAtA = false;
