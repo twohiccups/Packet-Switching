@@ -27,48 +27,74 @@ import javafx.stage.Stage;
  */
 public class SwitchingSimulation extends Application {
     
-    ArrayList<Data> allData;  // Hold throughput at different probabilities;
+    ArrayList<Data> collectedData;  // Hold throughput at different probabilities;
     
     @Override
     public void start(Stage primaryStage) {
         
         // create the array
-        allData = new ArrayList<Data>();
+        collectedData = new ArrayList<Data>();
         
         // run the discrete simulation
         simulateOuterLoop();
         
- 
-        NumberAxis probabilityAxis = new NumberAxis(0,1,0.01);
-        probabilityAxis.setLabel("Probability");
-        NumberAxis throughputAxis  = new NumberAxis(0,1,0.01);
-        throughputAxis.setLabel("Throughput");
+        // for throughput at A
+        NumberAxis probabilityAxis1 = new NumberAxis(-0.1, 1.1, 0.1);
+        probabilityAxis1.setLabel("Probability");
+        NumberAxis throughputAxis1  = new NumberAxis(-0.1, 1.1, 0.1);
+        throughputAxis1.setLabel("Throughput");
         ScatterChart<Number, Number> chart1 = 
-                new ScatterChart<Number, Number> (probabilityAxis,throughputAxis);
+                new ScatterChart<Number, Number> (probabilityAxis1, throughputAxis1);
         chart1.setTitle("Throughput at A  vs  Probability");
         
         XYChart.Series series1 = new XYChart.Series();
         series1.setName("Scatter Data");
         
-        for (int i = 0; i < allData.size(); i++) {
+        for (int i = 0; i < collectedData.size(); i++) {
             series1.getData().add(
-                    new XYChart.Data(i * 0.01, allData.get(i).throughputAtA)); 
+                    new XYChart.Data(i * 0.01, collectedData.get(i).throughputAtA)); 
         }
         
         chart1.getData().add(series1);
+        chart1.setPrefSize(450, 350);
+        
+        // for throughput at C
+        
+        NumberAxis probabilityAxis2 = new NumberAxis(-0.1, 1.1, 0.1);
+        probabilityAxis2.setLabel("Probability");
+        NumberAxis throughputAxis2  = new NumberAxis(-0.1, 1.1, 0.1);
+        throughputAxis2.setLabel("Throughput");
+        ScatterChart<Number, Number> chart2 = 
+                new ScatterChart<Number, Number> (probabilityAxis2, throughputAxis2);
+        chart2.setTitle("Throughput at C  vs  Probability");
+        
+        XYChart.Series series2 = new XYChart.Series();
+        series2.setName("Scatter Data");
+        
+        for (int i = 0; i < collectedData.size(); i++) {
+            series2.getData().add(
+                    new XYChart.Data(i * 0.01, collectedData.get(i).throughputAtC)); 
+        }
+        
+        chart2.getData().add(series2);
+        chart2.setPrefSize(450, 350);
+        
         
         
         HBox root = new HBox();
-        root.getChildren().add(chart1);
-        
-       
+        root.getChildren().addAll(chart1, chart2);
         
         
-        Scene scene = new Scene(root, 500, 500);
+        Scene scene = new Scene(root, 800, 800);
+        try {
+        scene.getStylesheets().add("file:src/switchingsimulation/Chart.css");
+        } catch (Exception ex) {
+            
+        }
         
         primaryStage.setTitle("Discrete Probability Simulation!");
         primaryStage.setScene(scene);
-       primaryStage.show();
+        primaryStage.show();
     }
 
     
@@ -77,13 +103,13 @@ public class SwitchingSimulation extends Application {
     }
     
     public void simulateOuterLoop() {
-        allData = new ArrayList();
+        collectedData = new ArrayList();
         Data data;
         for (double p = 0; p <= 1; p += Data.probabilityStep) { 
             data = new Data();
             simulateInnerLoop(p, data);
             data.calculateThroughputs();
-            allData.add(data);
+            collectedData.add(data);
         }  
     }
     
