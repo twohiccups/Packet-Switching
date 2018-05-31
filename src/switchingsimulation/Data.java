@@ -1,17 +1,13 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package switchingsimulation;
-
 /**
- *
- * @author XDXD
+ * @author Mark Koshkin
  */
+
 public class Data {
-    public final static double probabilityStep = 0.01;    
-    public final static int totalSlots = 6000;
+    public static double probabilityStep = 0.01;    
+    public static int totalSlots;
+    public static int minSlots = 0;
+    public static int maxSlots = 30000;
 
     int totalAtA;
     int totalAtB;
@@ -30,8 +26,6 @@ public class Data {
         throughputAtA = (double) totalAtA / totalSlots;
         throughputAtC = (double) totalAtC / totalSlots;  
     }
-    
-    
-            
-    
 }
+
+

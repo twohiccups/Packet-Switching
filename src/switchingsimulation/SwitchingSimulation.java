@@ -1,36 +1,75 @@
-/*
-*
-*
-*
-*
-
- .
- */
 package switchingsimulation;
-
 import java.util.ArrayList;
 import javafx.application.Application;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
+import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.ScatterChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.Slider;
+import javafx.scene.control.Tooltip;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
-/**
- *
- * @author XDXD
- */
+/** @author Mark Koshkin **/
 public class SwitchingSimulation extends Application {
     
     ArrayList<Data> collectedData;  // Hold throughput at different probabilities;
     
     @Override
     public void start(Stage primaryStage) {
+        
+        VBox root = new VBox();
+        
+        root.setPadding(new Insets(15,15,15,15));
+        Label label = new Label(
+                  "The following program simulates system that consists of input nodes (A, B) and one\n"
+                + "output node (C). At a time slot, up to two packeges can arrive to each of the input\n"
+                + "nodes. The packets are then forwarded to the output node which accepts up to two packets\n"
+                + "and discards the remaining. At each time slot the probability a package arriving is p.\n"
+                + "The probability is varied with an increment \"of 0.01. Then the throughput at the nodes\n"
+                +  "A and C are plotted against the probability.\n");
+        
+        Image image = new Image("switchingsimulation/switchnodes.png");
+        ImageView imageView = new ImageView(image);
+        
+        Slider slider = new Slider();
+        slider.setMax(Data.maxSlots);
+        slider.setMin(Data.minSlots);
+        slider.setTooltip(new Tooltip("Number of Time Slots"));
+        slider.setShowTickLabels(true);
+        slider.setShowTickMarks(true);
+        slider.setMajorTickUnit(slider.getMax()/4);
+        slider.setBlockIncrement(5);
+       
+        
+        Button button = new Button("Simulate");
+        
+        button.setOnAction(e -> {
+            Data.totalSlots = (int)slider.getValue();
+            simulate(new Stage());
+        });
+        
+        
+        
+        
+        root.getChildren().addAll(label, imageView, slider, button);
+        
+        Scene scene = new Scene(root);
+        primaryStage.setScene(scene);
+        primaryStage.show();
+    }
+    
+    
+    
+    
+    public void simulate(Stage primaryStage) {
         
         // create the array
         collectedData = new ArrayList<Data>();
@@ -84,6 +123,7 @@ public class SwitchingSimulation extends Application {
         HBox root = new HBox();
         root.getChildren().addAll(chart1, chart2);
         
+       
         
         Scene scene = new Scene(root, 800, 800);
         try {
@@ -95,13 +135,18 @@ public class SwitchingSimulation extends Application {
         primaryStage.setTitle("Discrete Probability Simulation!");
         primaryStage.setScene(scene);
         primaryStage.show();
+        scene.setOnMouseClicked(e -> {
+            primaryStage.close();
+        });
     }
 
-    
     public static void main(String[] args) {
         launch(args);
     }
     
+    
+    
+    // Runs simulations at given probabilities
     public void simulateOuterLoop() {
         collectedData = new ArrayList();
         Data data;
@@ -113,21 +158,19 @@ public class SwitchingSimulation extends Application {
         }  
     }
     
-    // generates packets at a given timeslot
-    // and updates the data class
-    public void simulateInnerLoop(double probability, Data data) {
+    // Generates N time slots
+    private void simulateInnerLoop(double probability, Data data) {
         for (int i = 0; i < Data.totalSlots; i++) {
             simulateStep(probability, data);    
         }
     }
     
     
-    // generates packets at a given time slot
+    // Generates packets randomly at a given time slot
     // and updates the data class
     private  void simulateStep(double probability, Data data) {
         
-        Boolean atLeastOneAtA = false;
-        Boolean atLeastOneAtB = false;
+        Boolean atLeastOneAtA = false, atLeastOneAtB = false;
         
         // 0,1: packets at A
         if (Math.random() < probability) {
@@ -147,13 +190,10 @@ public class SwitchingSimulation extends Application {
              data.totalAtB++;  
              atLeastOneAtB = true;
         }
-        
         // packets at C 
         if (atLeastOneAtA || atLeastOneAtB) {
             data.totalAtC++;
         } 
     
-    }
-    
-    
+    } 
 }
